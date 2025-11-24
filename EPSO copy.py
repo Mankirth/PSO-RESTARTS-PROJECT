@@ -18,6 +18,7 @@
 import time
 import numpy as np
 from EvoloPy.solution import solution
+import heapq
 
 # Function to update the local best position based on a ring neighborhood
 def update_lbest(costs, positions):
@@ -67,6 +68,7 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
     rng = np.random.default_rng()
     # Initialize particle positions randomly within the bounds
     pos = rng.uniform(LB, UB, size=(PopSize, dim))
+    s.startingPositions = pos
     # Initialize particle velocities to zero
     vel = np.zeros((PopSize, dim))
 
@@ -201,6 +203,7 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
     # ✅ Final attributes (always well-formed)
     s.best = float(gBestScore) # Store the final global best fitness
     s.bestIndividual = np.array(gBest, dtype=float).tolist() # Store the position of the final global best particle
+    s.finalPositions = pos
     s.convergence = np.array(convergence_curve, dtype=float).tolist() # Store the convergence curve
 
     # Safety: ensure convergence curve has full length by padding if necessary
