@@ -39,6 +39,7 @@ def PSO(objf, lb, ub, dim, PopSize, iters, seed):
     pos = numpy.zeros((PopSize, dim))
     for i in range(dim):
         pos[:, i] = numpy.random.uniform(0, 1, PopSize) * (ub[i] - lb[i]) + lb[i]
+    s.startingPositions = pos
 
     convergence_curve = numpy.zeros(iters)
 
@@ -96,5 +97,6 @@ def PSO(objf, lb, ub, dim, PopSize, iters, seed):
     s.optimizer = "PSO"
     s.bestIndividual = gBest
     s.objfname = objf.__name__
+    s.endingPositions = pos
 
     return s

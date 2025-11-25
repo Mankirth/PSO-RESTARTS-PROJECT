@@ -65,7 +65,7 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
     print(f'EPSO is optimizing "{s.objfname}"')
 
     # Initialize random number generator
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed)
     # Initialize particle positions randomly within the bounds
     pos = rng.uniform(LB, UB, size=(PopSize, dim))
     s.startingPositions = pos
@@ -203,8 +203,8 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
     # ✅ Final attributes (always well-formed)
     s.best = float(gBestScore) # Store the final global best fitness
     s.bestIndividual = np.array(gBest, dtype=float).tolist() # Store the position of the final global best particle
-    s.finalPositions = pos
-    s.convergence = np.array(convergence_curve, dtype=float).tolist() # Store the convergence curve
+    s.endingPositions = pos
+    s.convergence = np.array(convergence_curve, dtype=float) # Store the convergence curve
 
     # Safety: ensure convergence curve has full length by padding if necessary
     if len(s.convergence) < iters:

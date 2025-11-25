@@ -72,8 +72,8 @@ def FPSO(objf, lb, ub, dim, PopSize, iters, seed):
 
     # Restart points for periodic restarts
     restart_points = [int(frac * iters) for frac in [0.2, 0.4, 0.6, 0.8, 1.0]]
-    s.startintPositions = pos
-    restartEndPositions = [[],[],[],[],[]]
+    s.startingPositions = pos
+    restartEndPositions = []
 
     for l in range(iters):
         # ---------- Evaluation ----------
@@ -92,10 +92,10 @@ def FPSO(objf, lb, ub, dim, PopSize, iters, seed):
                 gBest = pos[i, :].copy()
         
         if (l + 1) in restart_points:
-            restartEndPositions[restart_points.index(l+1)] = pos
+            restartEndPositions.append(pos)
 
         # ---------- Inertia Weight ----------
-        w = wMax - l * ((wMax - wMin) / 1200)
+        w = wMax - l * ((wMax - wMin) / 6000)
 
         # ---------- Update Velocity and Position ----------
         for i in range(PopSize):
@@ -133,6 +133,10 @@ def FPSO(objf, lb, ub, dim, PopSize, iters, seed):
     s.optimizer = "FPSO"
     s.bestIndividual = gBest
     s.objfname = objf.__name__
-    s.restartEndPositions = restartEndPositions
+    s.restart1Positions = restartEndPositions[0]
+    s.restart2Positions = restartEndPositions[1]
+    s.restart3Positions = restartEndPositions[2]
+    s.restart4Positions = restartEndPositions[3]
+    s.endPositions = restartEndPositions[4]
 
     return s
