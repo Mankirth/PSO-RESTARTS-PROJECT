@@ -1,0 +1,121 @@
+
+
+import math
+import random
+import numpy
+from EvoloPy.solution import solution
+import time
+
+
+def reflect(value, lower_bound, upper_bound):
+
+    if lower_bound >= upper_bound:
+        return lower_bound  
+    
+    range_size = upper_bound - lower_bound
+    
+    normalized = (value - lower_bound) % (2 * range_size)
+    
+    if normalized > range_size:
+        return upper_bound - (normalized - range_size)
+    return lower_bound + normalized
+
+def PSO(objf, lb, ub, dim, PopSize, iters, seed):
+    numpy.random.seed(seed)
+    random.seed(seed)
+
+    # PSO parameters
+
+    Vmax = 6
+    wMax = 0.9
+    wMin = 0.2
+    c1 = 2.05
+    c2 = 2.05
+
+    s = solution()
+    if not isinstance(lb, list):
+        lb = [lb] * dim
+    if not isinstance(ub, list):
+        ub = [ub] * dim
+
+    ######################## Initializations
+
+    vel = numpy.zeros((PopSize, dim))
+
+    pBestScore = numpy.zeros(PopSize)
+    pBestScore.fill(float("inf"))
+
+    pBest = numpy.zeros((PopSize, dim))
+    gBest = numpy.zeros(dim)
+
+    gBestScore = float("inf")
+
+    pos = numpy.zeros((PopSize, dim))
+    for i in range(dim):
+        pos[:, i] = numpy.random.uniform(0, 1, PopSize) * (ub[i] - lb[i]) + lb[i]
+    s.startingPositions = pos
+
+    convergence_curve = numpy.zeros(iters)
+
+    ############################################
+    print('PSO is optimizing  "' + objf.__name__ + '"')
+
+    timerStart = time.time()
+    s.startTime = time.strftime("%Y-%m-%d-%H-%M-%S")
+
+    for l in range(0, iters):
+        for i in range(0, PopSize):
+            # pos[i,:]=checkBounds(pos[i,:],lb,ub)
+            for j in range(dim):
+                pos[i,j] = reflect(pos[i,j], lb[j], ub[j])
+                # pos[i, j] = numpy.clip(pos[i, j], lb[j], ub[j])
+            # Calculate objective function for each particle
+            fitness = objf(pos[i, :])
+
+            if pBestScore[i] > fitness:
+                pBestScore[i] = fitness
+                pBest[i, :] = pos[i, :].copy()
+
+            if gBestScore > fitness:
+                gBestScore = fitness
+                gBest = pos[i, :].copy()
+
+        # Update the W of PSO
+        w = wMax - l * ((wMax - wMin) / iters)
+
+        for i in range(0, PopSize):
+            for j in range(0, dim):
+                r1 = random.random()
+                r2 = random.random()
+                vel[i, j] = (
+                    w * vel[i, j]
+                    + c1 * r1 * (pBest[i, j] - pos[i, j])
+                    + c2 * r2 * (gBest[j] - pos[i, j])
+                )
+
+                c = c1 + c2
+                r = 2 / (abs(2 - c - math.sqrt((c * c) - (4*c))))
+                vel[i,j] = r*vel[i,j]
+
+                if vel[i, j] > Vmax:
+                    vel[i, j] = Vmax
+
+                if vel[i, j] < -Vmax:
+                    vel[i, j] = -Vmax
+
+                pos[i, j] = pos[i, j] + vel[i, j]
+
+        convergence_curve[l] = gBestScore
+
+        if l % 1 == 0:
+            print(["At iteration " + str(l + 1) + " the best fitness is " + str(gBestScore)])
+    timerEnd = time.time()
+    s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
+    s.executionTime = timerEnd - timerStart
+    s.convergence = convergence_curve
+    s.optimizer = "PSO"
+    s.bestIndividual = gBest
+    s.objfname = objf.__name__
+    s.endingPositions = pos
+
+    return s
