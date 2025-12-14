@@ -101,6 +101,8 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
     # Timing the optimization process
     t0 = time.time()
     s.startTime = time.strftime("%Y-%m-%d-%H-%M-%S")
+    s.restart1Initial = pos.copy()
+    restartNo = 1
 
     # Main optimization loop
     for l in range(iters):
@@ -149,7 +151,7 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
             gBest = pBest[g_idx, :].copy()
 
         # Record the global best fitness for this iteration
-        convergence_curve[l] = gBestScore
+        # convergence_curve[l] = gBestScore
 
         # Exploratory detection for the restart mechanism
         for start, end in exploratory_windows:
@@ -162,7 +164,7 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
                 # Identify particles with speed above the average
                 exploratory_indices = np.where(speeds > avg_speed)[0]
                 # Get the positions of the exploratory particles
-                [exploratory_positions.append(posit) for posit in pos[exploratory_indices]]
+                [exploratory_positions.append(position) for position in pos[exploratory_indices]]
                 # Get the fitness of the exploratory particles
                 exploratory_fitness = np.concatenate((exploratory_fitness, newCosts[exploratory_indices]))
                 
@@ -172,8 +174,18 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
                     # Collect the top 50 fittest exploratory particles (or fewer if less than 50)
                     top50 = []
                     [top50.append(exploratory_positions[index]) for index in sorted_indices[:min(50, len(sorted_indices))]]
-                    # print(sorted_indices[:min(50, len(sorted_indices))].tolist()[:min(50, len(sorted_indices))])
-                    # top50 = exploratory_positions[sorted_indices[:min(50, len(sorted_indices))].tolist()[:min(50, len(sorted_indices))]]
+                    match restartNo:
+                        case 1:
+                            s.restart1End = pos.copy()
+                        case 2:
+                            s.restart2End = pos.copy()
+                        case 3:
+                            s.restart3End = pos.copy()
+                        case 4:
+                            s.restart4End = pos.copy()
+                        case 5:
+                            s.restart5End = pos.copy()
+                    restartNo += 1
 
         # Restart mechanism
         # Check if the current iteration is a restart point
@@ -197,7 +209,18 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
             lbest = update_lbest(pBestScore, pos)
             exploratory_positions = []
             exploratory_fitness = []
+
+            match restartNo:
+                case 2:
+                    s.restart2Initial = pos.copy()
+                case 3:
+                    s.restart3Initial = pos.copy()
+                case 4:
+                    s.restart4Initial = pos.copy()
+                case 5:
+                    s.restart5Initial = pos.copy()
         # Print the best fitness at the current iteration
+        convergence_curve[l] = gBestScore
         print(f'At iteration {l + 1} the best fitness is {gBestScore}')
 
     # Wrap up - finalize the results
@@ -208,7 +231,7 @@ def EPSO(objf, lb, ub, dim, PopSize, iters, seed):
     # ✅ Final attributes (always well-formed)
     s.best = float(gBestScore) # Store the final global best fitness
     s.bestIndividual = np.array(gBest, dtype=float).tolist() # Store the position of the final global best particle
-    s.endingPositions = pos
+    s.endingPositions = pos.copy()
     s.convergence = np.array(convergence_curve, dtype=float) # Store the convergence curve
 
     # Safety: ensure convergence curve has full length by padding if necessary
