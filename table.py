@@ -11,23 +11,20 @@ line = []
 columns = ('PSO Mean', 'PSO StdDev', 'EPSO Mean', 'EPSO StdDev', "%-Diff", "Paired T-Test")
 rows = ['1','2','3','4','5','6','7','8','9','10','11','12']
 errors = [300, 400, 600, 800, 900, 1800, 2000, 2200, 2300, 2400, 2600, 2700]
-for i in range(12):
-    fileResultsDetailsData = pd.read_csv("PSOs F1-F12\\experiment_details.csv")
+for i in range(1):
+    fileResultsDetailsData = pd.read_csv("Finals CEC\\experiment_details.csv")
     objective_name = "F" + str(i+1)
     optimizer_name = "PSO"
-    detailedData = fileResultsDetailsData[
-        (fileResultsDetailsData["Optimizer"] == optimizer_name)
-        & (fileResultsDetailsData["objfname"] == objective_name)
-    ]
-    detailedData = detailedData["Iter" + str(2000)]
-    detailedData = np.array(detailedData).T.tolist()
+    detailedData = fileResultsDetailsData["Iter" + str(2000)][0]
     data.append(detailedData)
-
+    print(data)
+    detailedData = detailedData
+    detailedData = np.array(detailedData).T.tolist()
     for t in range(30):
         detailedData[t] -= errors[i]
     gwoData = detailedData
 
-    fileResultsDetailsData = pd.read_csv("PSOs F1-F12\\experiment_details.csv")
+    fileResultsDetailsData = pd.read_csv("Finals CEC\\experiment_details.csv")
     objective_name = "F" + str(i+1)
     optimizer_name = "EPSO"
     detailedData = fileResultsDetailsData[
@@ -73,6 +70,6 @@ ax.table(rowLabels=rows,
         loc='center')
 fig.tight_layout()
 
-fig_name = "PSOs F1-F12\\" + "table.png"
+fig_name = "Finals CEC\\" + "table.png"
 plt.savefig(fig_name, bbox_inches="tight")
 plt.clf()

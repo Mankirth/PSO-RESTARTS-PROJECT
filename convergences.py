@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 plt.ioff()
 
 data = np.zeros((30, 6000))
-fileResultsDetailsData = pd.read_csv("EPSO collected\\experiment_details.csv")
+fileResultsDetailsData = pd.read_csv("Finals Rastrigin\\experiment_details.csv")
 objective_name = "rastrigin"
-optimizer_name = "EPSO"
+optimizer_name = "PSO"
 
 detailedData = fileResultsDetailsData[
     (fileResultsDetailsData["Optimizer"] == optimizer_name)
@@ -15,7 +15,7 @@ detailedData = fileResultsDetailsData[
 ]
 for i in range(1, 6001):
     columnData = detailedData["Iter" + str(i)]
-    columnData = np.array(columnData).T.tolist()
+    columnData = np.array(columnData).tolist()
     for t in range(0, 30):
         data[t][i-1] = columnData[t]
 
@@ -25,7 +25,7 @@ for t in range(0, 30):
     plt.ylabel("Fitness")
     plt.legend(loc="upper right", bbox_to_anchor=(1.2, 1.02))
     plt.grid()
-    fig_name = "Convergences\\EPSO Collected\\/EPSO-Convergence"+ str(t) + "-" + objective_name + ".png"
+    fig_name = "Convergences\\Final PSO\\/PSO-Convergence"+ str(t) + "-" + objective_name + ".png"
     plt.savefig(fig_name, bbox_inches="tight")
     plt.clf()
 
