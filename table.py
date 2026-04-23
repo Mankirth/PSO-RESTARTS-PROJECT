@@ -28,7 +28,7 @@ for i in range(12):
 
     fileResultsDetailsData = pd.read_csv("PSOs 25\\experiment_details.csv")
     objective_name = "F" + str(i+1)
-    optimizer_name = "EPSO"
+    optimizer_name = "FPSO"
     detailedData = fileResultsDetailsData[
         (fileResultsDetailsData["Optimizer"] == optimizer_name)
         & (fileResultsDetailsData["objfname"] == objective_name)
@@ -72,6 +72,6 @@ ax.table(rowLabels=rows,
         loc='center')
 fig.tight_layout()
 
-fig_name = "PSOs 25\\" + "table.png"
+fig_name = "PSOs 25\\" + "5table.png"
 plt.savefig(fig_name, bbox_inches="tight")
 plt.clf()
